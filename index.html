@@ -164,6 +164,13 @@
             background-color: #eee;
         }
 
+        /* --- CONTENT SECTIONS --- */
+        .content-section { padding: 80px 0; }
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-tag { display: inline-block; font-family: var(--font-mono); font-size: 0.9rem; color: var(--color-primary); margin-bottom: 0.5rem; }
+        .section-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        .section-description { max-width: 600px; margin: 0 auto; color: var(--text-muted); }
+
         /* --- GLASSMORPHIC CARDS --- */
         .education-card, .skill-category, .project-card, .experience-card {
             background: var(--glass-bg);
@@ -318,7 +325,7 @@
             height: 24px;
             fill: currentColor;
         }
-
+        
         /* --- BUTTONS & INTERACTIVE ELEMENTS --- */
         .btn {
             display: inline-block;
@@ -479,31 +486,34 @@
 
         <section id="experience" class="content-section">
             <div class="container">
-                <div class="experience-card">
-  <div class="experience-card-header">
-    <h3 class="experience-title">Game Artist</h3>
-    <div class="experience-company">Super Huge Studio</div>
-    <div class="experience-date">Oct 2025 – Present</div>
-    <div class="experience-location">Raichur, Karnataka, India (On-site)</div>
-  </div>
-  <div class="experience-skills">
-    <span class="tag">2D/3D Asset Creation</span>
-    <span class="tag">Unity Integration</span>
-    <span class="tag">Animation & Rigging</span>
-    <span class="tag">Environment Modeling</span>
-    <span class="tag">UI/UX Art</span>
-    <span class="tag">Technical Art</span>
-    <span class="tag">Performance Optimization</span>
-  </div>
-  <p>
-    Created high-quality game art assets using Blender, Photoshop, and ZBrush. Developed character animations, terrain, and prop models, rigging and exporting seamlessly to Unity for implementation. Used Substance Painter for texturing and Figma/Illustrator for UI. Managed the asset pipeline and ensured technical compliance while collaborating with developers to match visual style and gameplay.
-  </p>
-</div>
                 <div class="section-header reveal-on-scroll">
                     <span class="section-tag">02 / My Career</span>
                     <h2 class="section-title">Work Experience</h2>
                 </div>
                 <div class="experience-timeline reveal-on-scroll">
+                    <!-- NEW: Game Artist role at Super Huge Studio -->
+                    <div class="experience-card">
+                        <div class="experience-card-header">
+                            <h3 class="experience-title">Game Artist</h3>
+                            <div class="experience-company">Super Huge Studio</div>
+                            <div class="experience-date">Oct 2025 – Present</div>
+                            <div class="experience-location">Raichur, Karnataka, India (On-site)</div>
+                        </div>
+                        <div class="experience-skills">
+                            <span class="tag">2D/3D Asset Creation</span>
+                            <span class="tag">Unity Integration</span>
+                            <span class="tag">Animation & Rigging</span>
+                            <span class="tag">Environment Modeling</span>
+                            <span class="tag">UI/UX Art</span>
+                            <span class="tag">Technical Art</span>
+                            <span class="tag">Performance Optimization</span>
+                        </div>
+                        <p>
+                            Created high-quality game art assets using Blender, Photoshop, and ZBrush. Developed character animations, terrain, and prop models, rigging and exporting seamlessly to Unity for implementation. Used Substance Painter for texturing and Figma/Illustrator for UI. Managed the asset pipeline and ensured technical compliance while collaborating with developers to match visual style and gameplay.
+                        </p>
+                    </div>
+
+                    <!-- Your previous jobs below -->
                     <div class="experience-card">
                         <div class="experience-card-header">
                             <div>
@@ -534,7 +544,6 @@
                     </div>
                 </div>
             </div>
-            
         </section>
 
         <section id="skills" class="content-section">
@@ -548,19 +557,20 @@
                     <div class="skill-category"><h3>Programming & Development</h3><ul><li>Python (Pandas, Flask)</li><li>JavaScript (ES6+)</li><li>VB.NET</li><li>HTML5 & CSS3</li><li>React.js (Fundamentals)</li></ul></div>
                     <div class="skill-category"><h3>Tools & Platforms</h3><ul><li>Zapier & Power Automate</li><li>Git & GitHub</li><li>Figma</li><li>MS Access & SQL</li><li>Docker (Fundamentals)</li></ul></div>
                 </div>
+                 <!-- NEW: Game Art Tools -->
+                <div class="skill-category">
+                  <h3>Game Art Tools</h3>
+                  <ul>
+                    <li>Adobe Photoshop</li>
+                    <li>Blender</li>
+                    <li>ZBrush</li>
+                    <li>Substance Painter</li>
+                    <li>Unity</li>
+                    <li>Figma/Illustrator</li>
+                    <li>Krita, GIMP, Piskel</li>
+                  </ul>
+                </div>
             </div>
-            <div class="skill-category">
-  <h3>Game Art Tools</h3>
-  <ul>
-    <li>Adobe Photoshop</li>
-    <li>Blender</li>
-    <li>ZBrush</li>
-    <li>Substance Painter</li>
-    <li>Unity</li>
-    <li>Figma/Illustrator</li>
-    <li>Krita, GIMP, Piskel</li>
-  </ul>
-</div>
         </section>
 
         <section id="projects" class="content-section">
@@ -640,7 +650,6 @@
                         </a>
                     </div>
                 </div>
-
             </div>
         </section>
     </main>
@@ -667,7 +676,7 @@
     <script>
         class ProfessionalPortfolio {
             constructor() {
-                this.API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=';
+                this.API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=';
                 this.API_KEY = ''; // Handled by environment
                 
                 this.init();
@@ -844,7 +853,7 @@
             setupTypingAnimation() {
                 const heroTitle = document.querySelector('.hero-title');
                 if (!heroTitle) return;
-                const roles = ["AI & Automation Developer", "Full Stack Developer", "Data Analyst", "UI/UX Enthusiast", "Prompt Engineering Specialist", "Creative Problem Solver"];
+                const roles = ["AI & Automation Developer", "Game Artist", "Full Stack Developer", "Data Analyst", "UI/UX Enthusiast", "Prompt Engineering Specialist"];
                 let roleIndex = 0, charIndex = 0, isDeleting = false;
                 function type() {
                     const currentRole = roles[roleIndex];
@@ -962,4 +971,3 @@
     </script>
 </body>
 </html>
-
