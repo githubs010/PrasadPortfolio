@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
     <style>
         :root {
             --bg-color: #f3f4f6;
@@ -37,7 +36,7 @@
 
         /* SPLASH */
         #splash{position:fixed;inset:0;z-index:99999;background:#030712;display:flex;align-items:center;justify-content:center;transition:opacity 0.6s ease,visibility 0.6s ease;}
-        #splash.hidden{opacity:0;visibility:hidden;}
+        #splash.hidden{opacity:0;visibility:hidden;pointer-events:none;}
         .splash-text{font-family:'JetBrains Mono',monospace;font-size:clamp(1.5rem,4vw,2.5rem);color:#fff;letter-spacing:0.1em;text-align:center;}
         .splash-text span{color:#6366f1;}
         .splash-bar{width:200px;height:3px;background:rgba(255,255,255,0.1);border-radius:3px;margin:1.5rem auto 0;}
@@ -55,24 +54,19 @@
         .cursor-outline.hovered{width:60px;height:60px;background-color:var(--accent-glow);border-color:var(--accent-primary);}
         .cursor-outline.clicking{transform:translate(-50%,-50%) scale(0.8);}
 
-        /* CANVAS */
         #neural-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.5;pointer-events:none;}
 
-        /* LAYOUT */
         .container{max-width:1200px;margin:0 auto;padding:0 2rem;}
         main{position:relative;z-index:1;}
         .section-padding{padding:6rem 0;}
 
-        /* REVEAL */
         .reveal{opacity:0;transform:translateY(40px);transition:opacity 0.7s var(--transition-smooth),transform 0.7s var(--transition-smooth);}
         .reveal.visible{opacity:1;transform:translateY(0);}
         .reveal-delay-1{transition-delay:0.1s;}
         .reveal-delay-2{transition-delay:0.2s;}
         .reveal-delay-3{transition-delay:0.3s;}
         .reveal-delay-4{transition-delay:0.4s;}
-        .reveal-delay-5{transition-delay:0.5s;}
 
-        /* TYPOGRAPHY */
         h1,h2,h3,h4{font-weight:800;letter-spacing:-0.02em;line-height:1.1;}
         .font-mono{font-family:'JetBrains Mono',monospace;}
         .gradient-text{background:linear-gradient(135deg,var(--text-primary) 30%,var(--accent-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -80,7 +74,7 @@
 
         /* NAV */
         .nav-fixed{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.5rem 0;transition:padding 0.3s,background 0.3s;}
-        .nav-fixed.scrolled{padding:1rem 0;background:var(--surface-color);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--surface-border);}
+        .nav-fixed.scrolled{padding:1rem 0;background:var(--surface-color);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--surface-border);}
         .nav-content{display:flex;justify-content:space-between;align-items:center;}
         .logo{font-size:1.5rem;font-weight:800;text-decoration:none;color:var(--text-primary);}
         .logo span{color:var(--accent-primary);}
@@ -117,126 +111,63 @@
         .btn-outline:hover{border-color:var(--accent-primary);color:var(--accent-primary);background:var(--accent-glow);}
 
         /* GLASS CARD */
-        .glass-card{background:var(--surface-color);border:1px solid var(--surface-border);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-radius:20px;padding:2rem;transition:transform 0.1s linear,box-shadow 0.3s,border-color 0.3s;box-shadow:var(--card-shadow);transform-style:preserve-3d;position:relative;overflow:hidden;}
+        .glass-card{background:var(--surface-color);border:1px solid var(--surface-border);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:20px;padding:2rem;transition:transform 0.1s linear,box-shadow 0.3s,border-color 0.3s;box-shadow:var(--card-shadow);transform-style:preserve-3d;position:relative;overflow:hidden;}
         .glass-card::before{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent);transform:skewX(-15deg);transition:left 0.6s ease;}
         .glass-card:hover::before{left:130%;}
         .glass-card:hover{border-color:var(--accent-primary);box-shadow:0 20px 60px -15px rgba(99,102,241,0.3);}
+
+        /* ABOUT STATS */
+        .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem;}
+        .stat-item{text-align:center;padding:1rem;border-radius:12px;background:var(--accent-glow);border:1px solid var(--surface-border);}
+        .stat-item h3{font-size:2rem;color:var(--accent-primary);margin-bottom:0.25rem;}
 
         /* PORTFOLIO HUB */
         .portfolio-hub{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;margin-top:2rem;}
         .portfolio-link-card{text-decoration:none;color:var(--text-primary);display:flex;flex-direction:column;align-items:center;text-align:center;padding:2rem;}
         .portfolio-icon{font-size:2.5rem;margin-bottom:1rem;color:var(--accent-secondary);}
 
-        /* ======================== */
-        /*   ARTWORKS GALLERY       */
-        /* ======================== */
-        .art-masonry {
-            columns: 3;
-            column-gap: 1.25rem;
-        }
-        @media(max-width:900px){.art-masonry{columns:2;}}
-        @media(max-width:500px){.art-masonry{columns:1;}}
+        /* ========================
+           ARTWORKS 1:1 GALLERY
+        ======================== */
+        .art-grid-square{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+        @media(max-width:1024px){.art-grid-square{grid-template-columns:repeat(3,1fr);}}
+        @media(max-width:700px){.art-grid-square{grid-template-columns:repeat(2,1fr);}}
+        @media(max-width:400px){.art-grid-square{grid-template-columns:1fr;}}
 
-        .art-item {
-            break-inside: avoid;
-            margin-bottom: 1.25rem;
-            position: relative;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--surface-border);
-            background: var(--surface-color);
-            backdrop-filter: blur(10px);
-            cursor: pointer;
-        }
-        .art-item img {
-            width: 100%;
-            height: auto;
-            display: block;
-            transition: transform 0.5s ease, filter 0.3s;
-        }
-        .art-item:hover img {
-            transform: scale(1.05);
-            filter: brightness(0.65);
-        }
-        .art-item-overlay {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 1.25rem;
-            background: linear-gradient(to top, rgba(3,7,18,0.85) 40%, transparent);
-            opacity: 0;
-            transition: opacity 0.35s;
-        }
-        .art-item:hover .art-item-overlay { opacity: 1; }
-        .art-item-overlay span {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.6);
-            margin-bottom: 0.25rem;
-        }
-        .art-item-overlay p {
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.95rem;
-        }
-        .art-badge {
-            position: absolute;
-            top: 0.75rem;
-            right: 0.75rem;
-            padding: 0.2rem 0.65rem;
-            border-radius: 20px;
-            font-size: 0.68rem;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-            backdrop-filter: blur(8px);
-        }
-        .badge-3d   { background: rgba(99,102,241,0.85); color:#fff; }
-        .badge-art  { background: rgba(168,85,247,0.85); color:#fff; }
-        .badge-photo{ background: rgba(16,185,129,0.85); color:#fff; }
-        .badge-char { background: rgba(245,158,11,0.85); color:#fff; }
+        .art-square-item{position:relative;aspect-ratio:1/1;border-radius:14px;overflow:hidden;border:1px solid var(--surface-border);background:var(--surface-color);cursor:pointer;transition:transform 0.3s var(--transition-smooth),box-shadow 0.3s,border-color 0.3s;}
+        .art-square-item:hover{transform:scale(1.04);border-color:var(--accent-primary);box-shadow:0 12px 40px -8px rgba(99,102,241,0.45);z-index:2;}
+        .art-square-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.5s,filter 0.3s;}
+        .art-square-item:hover img{transform:scale(1.08);filter:brightness(0.6);}
+        .art-square-overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:0.85rem;background:linear-gradient(to top,rgba(3,7,18,0.88) 40%,transparent);opacity:0;transition:opacity 0.3s;}
+        .art-square-item:hover .art-square-overlay{opacity:1;}
+        .art-square-overlay span{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:rgba(255,255,255,0.55);margin-bottom:0.2rem;}
+        .art-square-overlay p{color:#fff;font-weight:700;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .art-badge{position:absolute;top:0.6rem;right:0.6rem;padding:0.18rem 0.55rem;border-radius:20px;font-size:0.62rem;font-weight:700;font-family:'JetBrains Mono',monospace;backdrop-filter:blur(8px);z-index:3;}
+        .badge-3d{background:rgba(99,102,241,0.9);color:#fff;}
+        .badge-art{background:rgba(168,85,247,0.9);color:#fff;}
+        .badge-photo{background:rgba(16,185,129,0.9);color:#fff;}
+        .badge-char{background:rgba(245,158,11,0.9);color:#fff;}
+        .art-zoom-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.6);font-size:2rem;opacity:0;transition:opacity 0.3s,transform 0.3s;z-index:4;pointer-events:none;}
+        .art-square-item:hover .art-zoom-icon{opacity:1;transform:translate(-50%,-50%) scale(1);}
 
         /* VIDEO REEL */
-        .reel-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-        .reel-card {
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--surface-border);
-            background: #000;
-            position: relative;
-        }
-        .reel-card video {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            display: block;
-        }
-        .reel-label {
-            padding: 0.75rem 1rem;
-            background: var(--surface-color);
-            backdrop-filter: blur(10px);
-            font-size: 0.85rem;
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .reel-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; animation: pulse-dot 1.5s ease-in-out infinite; }
-        @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+        .reel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem;margin-top:2rem;}
+        .reel-card{border-radius:16px;overflow:hidden;border:1px solid var(--surface-border);background:#000;}
+        .reel-card video{width:100%;height:210px;object-fit:cover;display:block;}
+        .reel-label{padding:0.7rem 1rem;background:var(--surface-color);backdrop-filter:blur(10px);font-size:0.82rem;font-family:'JetBrains Mono',monospace;color:var(--text-secondary);display:flex;align-items:center;gap:0.5rem;}
+        .reel-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0;animation:pulse-dot 1.5s ease-in-out infinite;}
+        @keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:0.3;}}
 
         /* LIGHTBOX */
-        .lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:5000;display:none;align-items:center;justify-content:center;padding:2rem;}
+        .lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.96);z-index:9999;display:none;align-items:center;justify-content:center;padding:1.5rem;}
         .lightbox.active{display:flex;}
-        .lightbox img{max-width:90vw;max-height:88vh;border-radius:12px;box-shadow:0 0 60px rgba(99,102,241,0.4);object-fit:contain;}
-        .lightbox-close{position:absolute;top:1.5rem;right:2rem;font-size:2.5rem;color:white;background:none;border:none;font-weight:700;opacity:0.7;}
-        .lightbox-close:hover{opacity:1;}
+        .lightbox-inner{position:relative;max-width:92vw;max-height:90vh;display:flex;align-items:center;justify-content:center;animation:lbZoom 0.3s var(--transition-smooth);}
+        @keyframes lbZoom{from{transform:scale(0.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+        .lightbox-inner img{max-width:88vw;max-height:88vh;width:auto;height:auto;border-radius:14px;box-shadow:0 0 80px rgba(99,102,241,0.35);object-fit:contain;display:block;}
+        .lightbox-close{position:fixed;top:1.25rem;right:1.5rem;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;font-size:1.3rem;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);transition:background 0.2s,transform 0.2s;z-index:10000;}
+        .lightbox-close:hover{background:rgba(239,68,68,0.7);transform:scale(1.1);}
+        .lightbox-caption{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:rgba(255,255,255,0.5);background:rgba(0,0,0,0.5);padding:0.4rem 1rem;border-radius:20px;backdrop-filter:blur(8px);white-space:nowrap;}
+        .lightbox-backdrop{position:fixed;inset:0;z-index:-1;}
 
         /* TIMELINE */
         .timeline{position:relative;padding-left:2rem;border-left:2px solid var(--surface-border);}
@@ -254,7 +185,7 @@
 
         /* SKILLS */
         .skills-container{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;}
-        .skill-box h3{margin-bottom:1.5rem;font-size:1.1rem;display:flex;align-items:center;gap:0.5rem;}
+        .skill-box h3{margin-bottom:1.5rem;font-size:1.1rem;}
         .skill-bar-item{margin-bottom:1rem;}
         .skill-bar-label{display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:0.4rem;color:var(--text-secondary);}
         .skill-bar-track{height:6px;background:var(--surface-border);border-radius:6px;overflow:hidden;}
@@ -268,11 +199,6 @@
         .project-body{padding:1.5rem;flex-grow:1;display:flex;flex-direction:column;}
         .project-desc{color:var(--text-secondary);margin-bottom:1rem;font-size:0.95rem;flex-grow:1;}
 
-        /* STATS */
-        .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem;}
-        .stat-item{text-align:center;padding:1rem;border-radius:12px;background:var(--accent-glow);border:1px solid var(--surface-border);}
-        .stat-item h3{font-size:2rem;color:var(--accent-primary);margin-bottom:0.25rem;}
-
         /* CONTACT */
         .contact-wrapper{display:grid;grid-template-columns:1fr 1fr;gap:4rem;}
         .contact-form{display:flex;flex-direction:column;gap:1.5rem;}
@@ -282,25 +208,17 @@
         .social-link{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--surface-color);border:1px solid var(--surface-border);border-radius:12px;text-decoration:none;color:var(--text-primary);margin-bottom:1rem;transition:all 0.3s;backdrop-filter:blur(10px);}
         .social-link:hover{transform:translateX(5px);border-color:var(--accent-primary);background:var(--accent-glow);}
 
-        /* MODAL */
-        .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:2000;opacity:0;pointer-events:none;transition:opacity 0.3s;display:flex;justify-content:center;align-items:center;}
-        .modal-backdrop.active{opacity:1;pointer-events:all;}
-        .modal-content{background:var(--bg-color);border:1px solid var(--accent-primary);padding:2rem;border-radius:16px;width:90%;max-width:600px;box-shadow:0 20px 50px rgba(0,0,0,0.5);transform:scale(0.9);transition:transform 0.3s var(--transition-smooth);}
-        .modal-backdrop.active .modal-content{transform:scale(1);}
-        .loader{width:24px;height:24px;border:3px solid var(--accent-primary);border-bottom-color:transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;}
-        @keyframes spin{to{transform:rotate(360deg);}}
-
         /* MOBILE */
         @media(max-width:768px){
             .hero-grid{grid-template-columns:1fr;text-align:center;}
             .hero-img-container{order:-1;margin-bottom:2rem;}
             .contact-wrapper{grid-template-columns:1fr;}
             .stats-grid{grid-template-columns:1fr;}
+            .reel-grid{grid-template-columns:1fr;}
+            .orbit-ring,.orbit-ring-2{display:none;}
             .nav-links{position:fixed;top:0;right:-100%;width:75%;height:100vh;background:var(--bg-color);flex-direction:column;padding:4rem 2rem;transition:right 0.4s var(--transition-smooth);border-left:1px solid var(--surface-border);backdrop-filter:blur(20px);}
             .nav-links.active{right:0;}
             .mobile-menu-btn{display:block;z-index:101;}
-            .orbit-ring,.orbit-ring-2{display:none;}
-            .reel-grid{grid-template-columns:1fr;}
         }
     </style>
 </head>
@@ -322,7 +240,7 @@
 <nav class="nav-fixed" id="navbar">
     <div class="container nav-content">
         <a href="#" class="logo" data-hover>Prasad<span>.J</span></a>
-        <button class="mobile-menu-btn" aria-label="Toggle Menu">☰</button>
+        <button class="mobile-menu-btn">☰</button>
         <ul class="nav-links">
             <li><a href="#about"      class="nav-link" data-hover>About</a></li>
             <li><a href="#showreel"   class="nav-link" data-hover>Showreel</a></li>
@@ -338,7 +256,7 @@
 
 <main>
 
-<!-- ========== HERO ========== -->
+<!-- ===== HERO ===== -->
 <section class="hero" id="home">
     <div class="container hero-grid">
         <div class="hero-content">
@@ -348,7 +266,7 @@
                 <span class="typewriter font-mono" style="font-size:0.6em;color:var(--text-secondary);"></span>
             </h1>
             <p class="hero-subtitle reveal reveal-delay-2">
-                I build intelligent systems and immersive game worlds. Bridging <strong>Full Stack Dev</strong>, <strong>Artificial Intelligence</strong>, and <strong>Game Art</strong>.
+                I build intelligent systems and immersive game worlds — bridging <strong>Full Stack Dev</strong>, <strong>Artificial Intelligence</strong>, and <strong>Game Art</strong>.
             </p>
             <div class="reveal reveal-delay-3" style="display:flex;gap:1rem;flex-wrap:wrap;">
                 <span class="btn-magnetic"><a href="#artworks" class="btn btn-primary" data-hover>🎨 View Artworks</a></span>
@@ -364,25 +282,25 @@
     </div>
 </section>
 
-<!-- ========== ABOUT ========== -->
+<!-- ===== ABOUT ===== -->
 <section id="about" class="section-padding">
     <div class="container">
         <span class="section-tag reveal">01. About Me</span>
         <h2 class="gradient-text reveal reveal-delay-1" style="font-size:2.5rem;margin-bottom:2rem;">A Passion for Intelligent Automation</h2>
         <div class="glass-card reveal reveal-delay-2" data-tilt>
             <p style="font-size:1.1rem;line-height:1.8;color:var(--text-secondary);">
-                As a recent <strong>M.Sc. Computer Science</strong> graduate, I am deeply passionate about the intersection of software development and creative technology. My focus is on leveraging powerful AI tools like ChatGPT and Gemini to create practical automation solutions, while simultaneously pushing the boundaries of interactive entertainment through Game Art.
+                As a recent <strong>M.Sc. Computer Science</strong> graduate, I am deeply passionate about the intersection of software development and creative technology. My focus is on leveraging AI tools like ChatGPT and Gemini to create practical automation solutions, while pushing the boundaries of interactive entertainment through Game Art.
             </p>
             <div class="stats-grid">
-                <div class="stat-item reveal reveal-delay-1"><h3>M.Sc.</h3><p>Computer Science (2024)</p><p class="font-mono" style="font-size:0.8rem;margin-top:5px;">Raichur University</p></div>
-                <div class="stat-item reveal reveal-delay-2"><h3>BCA</h3><p>Computer Applications (2020)</p><p class="font-mono" style="font-size:0.8rem;margin-top:5px;">Gulbarga University</p></div>
-                <div class="stat-item reveal reveal-delay-3"><h3>3+</h3><p>Core Domains</p><p class="font-mono" style="font-size:0.8rem;margin-top:5px;">AI · Web · Game Art</p></div>
+                <div class="stat-item"><h3>M.Sc.</h3><p>Computer Science (2024)</p><p class="font-mono" style="font-size:0.8rem;margin-top:5px;">Raichur University</p></div>
+                <div class="stat-item"><h3>BCA</h3><p>Computer Applications (2020)</p><p class="font-mono" style="font-size:0.8rem;margin-top:5px;">Gulbarga University</p></div>
+                <div class="stat-item"><h3>3+</h3><p>Core Domains</p><p class="font-mono" style="font-size:0.8rem;margin-top:5px;">AI · Web · Game Art</p></div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ========== SHOWREEL ========== -->
+<!-- ===== SHOWREEL ===== -->
 <section id="showreel" class="section-padding" style="background:var(--grid-line);">
     <div class="container">
         <span class="section-tag reveal">02. Creative Works</span>
@@ -402,174 +320,173 @@
     </div>
 </section>
 
-<!-- ========== ARTWORKS & 3D ASSETS ========== -->
+<!-- ===== ARTWORKS ===== -->
 <section id="artworks" class="section-padding">
     <div class="container">
         <span class="section-tag reveal">03. Artworks</span>
         <h2 class="gradient-text reveal reveal-delay-1" style="font-size:2.5rem;margin-bottom:0.75rem;">3D Assets & Digital Art</h2>
-        <p style="color:var(--text-secondary);margin-bottom:3rem;font-size:1.05rem;" class="reveal reveal-delay-2">
-            Click any image to view full size. Crafted in <strong>Blender</strong>, <strong>ZBrush</strong> & <strong>Photoshop</strong>.
+        <p class="reveal reveal-delay-2" style="color:var(--text-secondary);margin-bottom:2.5rem;font-size:1.05rem;">
+            Click any image to view full size · Made in <strong>Blender</strong> & <strong>Photoshop</strong>
         </p>
 
-        <!-- MASONRY GALLERY — all your real files -->
-        <div class="art-masonry">
+        <div class="art-grid-square">
 
-            <!-- 1.jpg -->
-            <div class="art-item reveal reveal-delay-1" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/1.jpg')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/1.jpg" alt="3D Asset" loading="lazy">
+            <div class="art-square-item reveal reveal-delay-1" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/1.jpg','Blender · Game Asset')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/1.jpg" alt="" loading="lazy">
                 <span class="art-badge badge-3d">3D</span>
-                <div class="art-item-overlay"><span>Blender · Game Asset</span><p>3D Asset</p></div>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Blender · Game Asset</span><p>3D Render</p></div>
             </div>
 
-            <!-- 2.jpg -->
-            <div class="art-item reveal reveal-delay-2" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/2.jpg')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/2.jpg" alt="3D Asset" loading="lazy">
+            <div class="art-square-item reveal reveal-delay-2" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/2.jpg','Blender · PBR Render')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/2.jpg" alt="" loading="lazy">
                 <span class="art-badge badge-3d">3D</span>
-                <div class="art-item-overlay"><span>Blender · PBR</span><p>3D Asset</p></div>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Blender · PBR</span><p>3D Render</p></div>
             </div>
 
-            <!-- 3.jpg -->
-            <div class="art-item reveal reveal-delay-3" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/3.jpg')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/3.jpg" alt="3D Asset" loading="lazy">
+            <div class="art-square-item reveal reveal-delay-3" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/3.jpg','Blender · Asset')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/3.jpg" alt="" loading="lazy">
                 <span class="art-badge badge-3d">3D</span>
-                <div class="art-item-overlay"><span>Blender · Game Asset</span><p>3D Asset</p></div>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Blender · Asset</span><p>3D Render</p></div>
             </div>
 
-            <!-- 5.jpg -->
-            <div class="art-item reveal reveal-delay-1" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/5.jpg')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/5.jpg" alt="3D Asset" loading="lazy">
+            <div class="art-square-item reveal reveal-delay-4" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/5.jpg','Blender · Low Poly')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/5.jpg" alt="" loading="lazy">
                 <span class="art-badge badge-3d">3D</span>
-                <div class="art-item-overlay"><span>Blender · Low Poly</span><p>3D Asset</p></div>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Blender · Low Poly</span><p>3D Render</p></div>
             </div>
 
-            <!-- 6.jpg -->
-            <div class="art-item reveal reveal-delay-2" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/6.jpg')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/6.jpg" alt="3D Asset" loading="lazy">
+            <div class="art-square-item reveal reveal-delay-1" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/6.jpg','Blender · Textured')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/6.jpg" alt="" loading="lazy">
                 <span class="art-badge badge-3d">3D</span>
-                <div class="art-item-overlay"><span>Blender · Textured</span><p>3D Asset</p></div>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Blender · Textured</span><p>3D Render</p></div>
             </div>
 
-            <!-- car.png -->
-            <div class="art-item reveal reveal-delay-3" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/car.png')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/car.png" alt="Car Asset" loading="lazy">
-                <span class="art-badge badge-3d">3D · Vehicle</span>
-                <div class="art-item-overlay"><span>Blender · Low-Poly</span><p>Car Asset</p></div>
+            <div class="art-square-item reveal reveal-delay-2" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/car.png','Car · Vehicle Asset')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/car.png" alt="" loading="lazy">
+                <span class="art-badge badge-3d">Vehicle</span>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Blender · Low-Poly Car</span><p>Car Asset</p></div>
             </div>
 
-            <!-- 1W.jpg -->
-            <div class="art-item reveal reveal-delay-1" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/1W.jpg')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/1W.jpg" alt="Wireframe" loading="lazy">
-                <span class="art-badge badge-3d">Wireframe</span>
-                <div class="art-item-overlay"><span>Blender · Wireframe</span><p>Wireframe View</p></div>
+            <div class="art-square-item reveal reveal-delay-3" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/1W.jpg','Blender · Wireframe')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/1W.jpg" alt="" loading="lazy">
+                <span class="art-badge badge-3d">Wire</span>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Blender · Wireframe</span><p>Topology</p></div>
             </div>
 
-            <!-- 2W.jpg -->
-            <div class="art-item reveal reveal-delay-2" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/2W.jpg')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/2W.jpg" alt="Wireframe" loading="lazy">
-                <span class="art-badge badge-3d">Wireframe</span>
-                <div class="art-item-overlay"><span>Blender · Topology</span><p>Wireframe View</p></div>
+            <div class="art-square-item reveal reveal-delay-4" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/2W.jpg','Blender · Topology')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/2W.jpg" alt="" loading="lazy">
+                <span class="art-badge badge-3d">Wire</span>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Blender · Topology</span><p>Wireframe</p></div>
             </div>
 
-            <!-- 3W.jpg -->
-            <div class="art-item reveal reveal-delay-3" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/3W.jpg')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/3W.jpg" alt="Wireframe" loading="lazy">
-                <span class="art-badge badge-3d">Wireframe</span>
-                <div class="art-item-overlay"><span>Blender · Topology</span><p>Wireframe View</p></div>
+            <div class="art-square-item reveal reveal-delay-1" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/3W.jpg','Blender · Topology')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/3W.jpg" alt="" loading="lazy">
+                <span class="art-badge badge-3d">Wire</span>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Blender · Topology</span><p>Wireframe</p></div>
             </div>
 
-            <!-- Character Cutout -01.png -->
-            <div class="art-item reveal reveal-delay-1" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/Character%20Cutout%20-01.png')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/Character%20Cutout%20-01.png" alt="Character" loading="lazy">
-                <span class="art-badge badge-char">Character</span>
-                <div class="art-item-overlay"><span>Blender · Character Art</span><p>Character Cutout</p></div>
+            <div class="art-square-item reveal reveal-delay-2" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/Character%20Cutout%20-01.png','Character Art')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/Character%20Cutout%20-01.png" alt="" loading="lazy">
+                <span class="art-badge badge-char">Char</span>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Character Art</span><p>Cutout</p></div>
             </div>
 
-            <!-- Custom Cover Making -->
-            <div class="art-item reveal reveal-delay-2" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/Custom%20Cover%20Making_Org%201-1.jpg')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/Custom%20Cover%20Making_Org%201-1.jpg" alt="Cover Art" loading="lazy">
-                <span class="art-badge badge-art">Photoshop</span>
-                <div class="art-item-overlay"><span>Photoshop · Cover Design</span><p>Custom Cover Art</p></div>
+            <div class="art-square-item reveal reveal-delay-3" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/Custom%20Cover%20Making_Org%201-1.jpg','Photoshop · Cover Art')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/Custom%20Cover%20Making_Org%201-1.jpg" alt="" loading="lazy">
+                <span class="art-badge badge-art">PS</span>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Photoshop · Cover</span><p>Cover Art</p></div>
             </div>
 
-            <!-- bud case.jpg -->
-            <div class="art-item reveal reveal-delay-3" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/bud%20case.jpg')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/bud%20case.jpg" alt="Bud Case" loading="lazy">
-                <span class="art-badge badge-3d">3D · Prop</span>
-                <div class="art-item-overlay"><span>Blender · Product</span><p>Bud Case</p></div>
+            <div class="art-square-item reveal reveal-delay-4" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/bud%20case.jpg','Blender · Prop')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/bud%20case.jpg" alt="" loading="lazy">
+                <span class="art-badge badge-3d">Prop</span>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Blender · Product</span><p>Bud Case</p></div>
             </div>
 
-            <!-- 1.png -->
-            <div class="art-item reveal reveal-delay-1" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/1.png')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/1.png" alt="Asset" loading="lazy">
+            <div class="art-square-item reveal reveal-delay-1" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/1.png','Blender · 3D Render')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/1.png" alt="" loading="lazy">
                 <span class="art-badge badge-3d">3D</span>
-                <div class="art-item-overlay"><span>Blender · Render</span><p>3D Render</p></div>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Blender · Render</span><p>3D Render</p></div>
             </div>
 
-            <!-- 122.png -->
-            <div class="art-item reveal reveal-delay-2" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/122.png')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/122.png" alt="Asset" loading="lazy">
+            <div class="art-square-item reveal reveal-delay-2" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/122.png','Digital Artwork')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/122.png" alt="" loading="lazy">
                 <span class="art-badge badge-art">Art</span>
-                <div class="art-item-overlay"><span>Digital Art</span><p>Digital Artwork</p></div>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Digital Art</span><p>Artwork</p></div>
             </div>
 
-            <!-- MY LOGO copy.jpg -->
-            <div class="art-item reveal reveal-delay-3" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/MY%20LOGO%20copy.jpg')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/MY%20LOGO%20copy.jpg" alt="Logo" loading="lazy">
-                <span class="art-badge badge-art">Logo Design</span>
-                <div class="art-item-overlay"><span>Photoshop · Branding</span><p>Personal Logo</p></div>
+            <div class="art-square-item reveal reveal-delay-3" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/MY%20LOGO%20copy.jpg','Personal Logo · Photoshop')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/MY%20LOGO%20copy.jpg" alt="" loading="lazy">
+                <span class="art-badge badge-art">Logo</span>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Photoshop · Branding</span><p>Personal Logo</p></div>
             </div>
 
-            <!-- WhatsApp artwork -->
-            <div class="art-item reveal reveal-delay-1" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/WhatsApp%20Image%202025-08-07%20at%2011.36.52_5324e4a8.jpg')">
-                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/WhatsApp%20Image%202025-08-07%20at%2011.36.52_5324e4a8.jpg" alt="Artwork" loading="lazy">
+            <div class="art-square-item reveal reveal-delay-4" onclick="openLightbox('https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/WhatsApp%20Image%202025-08-07%20at%2011.36.52_5324e4a8.jpg','Artwork')">
+                <img src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/WhatsApp%20Image%202025-08-07%20at%2011.36.52_5324e4a8.jpg" alt="" loading="lazy">
                 <span class="art-badge badge-photo">Photo</span>
-                <div class="art-item-overlay"><span>Photography</span><p>Artwork</p></div>
+                <div class="art-zoom-icon">🔍</div>
+                <div class="art-square-overlay"><span>Photography</span><p>Artwork</p></div>
             </div>
 
-        </div><!-- /art-masonry -->
+        </div>
 
-        <!-- VIDEO REELS -->
+        <!-- PROCESS VIDEOS -->
         <div style="margin-top:4rem;">
-            <h3 class="reveal" style="font-size:1.5rem;margin-bottom:0.5rem;">🎬 Process Recordings</h3>
-            <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:2rem;" class="reveal reveal-delay-1">Behind-the-scenes 3D workflow recordings</p>
+            <h3 class="reveal" style="font-size:1.4rem;margin-bottom:0.4rem;">🎬 Process Recordings</h3>
+            <p class="reveal reveal-delay-1" style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:1.5rem;">Blender workflow recordings</p>
             <div class="reel-grid">
                 <div class="reel-card reveal reveal-delay-1">
                     <video autoplay loop muted playsinline>
                         <source src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/Recording%202026-01-02%20135023.mp4" type="video/mp4">
                     </video>
-                    <div class="reel-label"><span class="reel-dot"></span> Workflow Recording 01 · Blender</div>
+                    <div class="reel-label"><span class="reel-dot"></span>Workflow 01 · Blender</div>
                 </div>
                 <div class="reel-card reveal reveal-delay-2">
                     <video autoplay loop muted playsinline>
                         <source src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/Recording%202026-01-02%20135107.mp4" type="video/mp4">
                     </video>
-                    <div class="reel-label"><span class="reel-dot"></span> Workflow Recording 02 · Blender</div>
+                    <div class="reel-label"><span class="reel-dot"></span>Workflow 02 · Blender</div>
                 </div>
                 <div class="reel-card reveal reveal-delay-3">
                     <video autoplay loop muted playsinline>
                         <source src="https://raw.githubusercontent.com/githubs010/PrasadPortfolio/main/Recording%202026-01-02%20135123.mp4" type="video/mp4">
                     </video>
-                    <div class="reel-label"><span class="reel-dot"></span> Workflow Recording 03 · Blender</div>
+                    <div class="reel-label"><span class="reel-dot"></span>Workflow 03 · Blender</div>
                 </div>
             </div>
         </div>
 
-        <!-- Drive Link -->
-        <div class="reveal reveal-delay-2" style="margin-top:3rem;">
-            <a href="https://drive.google.com/drive/folders/1V8yXrvuoS80yWLWfCunYelQrSosfAWDd?usp=drive_link" target="_blank" class="btn btn-primary" data-hover style="display:inline-flex;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                View Full Art Gallery on Google Drive
+        <div class="reveal reveal-delay-2" style="margin-top:2.5rem;">
+            <a href="https://drive.google.com/drive/folders/1V8yXrvuoS80yWLWfCunYelQrSosfAWDd?usp=drive_link" target="_blank" class="btn btn-primary" data-hover style="display:inline-flex;gap:0.6rem;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Full Gallery on Google Drive
             </a>
         </div>
     </div>
 </section>
 
-<!-- ========== EXPERIENCE ========== -->
+<!-- ===== EXPERIENCE ===== -->
 <section id="experience" class="section-padding" style="background:var(--grid-line);">
     <div class="container">
         <span class="section-tag reveal">04. Career Path</span>
         <h2 style="font-size:2.5rem;margin-bottom:3rem;" class="reveal reveal-delay-1">Work Experience</h2>
         <div class="timeline">
+
             <div class="timeline-item reveal reveal-delay-1">
                 <div class="timeline-dot"></div>
                 <div class="glass-card" data-tilt>
@@ -580,10 +497,15 @@
                     <p class="font-mono" style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:1rem;">Raichur, Karnataka (On-site)</p>
                     <p style="color:var(--text-secondary);margin-bottom:1rem;">Created high-quality game art assets using Blender, Photoshop, and ZBrush. Developed character animations, terrain, and prop models, rigging and exporting seamlessly to Unity.</p>
                     <div class="role-tags">
-                        <span class="tech-tag">3D Modeling</span><span class="tech-tag">Unity</span><span class="tech-tag">Animation</span><span class="tech-tag">UI/UX Art</span><span class="tech-tag">Blender</span>
+                        <span class="tech-tag">3D Modeling</span>
+                        <span class="tech-tag">Unity</span>
+                        <span class="tech-tag">Animation</span>
+                        <span class="tech-tag">UI/UX Art</span>
+                        <span class="tech-tag">Blender</span>
                     </div>
                 </div>
             </div>
+
             <div class="timeline-item reveal reveal-delay-2">
                 <div class="timeline-dot"></div>
                 <div class="glass-card" data-tilt>
@@ -593,20 +515,25 @@
                     </div>
                     <p class="font-mono" style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:1rem;">Raichur, Karnataka (On-site)</p>
                     <div class="role-tags">
-                        <span class="tech-tag">Informatica</span><span class="tech-tag">Data Refining</span><span class="tech-tag">AI Analysis</span><span class="tech-tag">Statistical Analysis</span>
+                        <span class="tech-tag">Informatica</span>
+                        <span class="tech-tag">Data Refining</span>
+                        <span class="tech-tag">AI Analysis</span>
+                        <span class="tech-tag">Statistical Analysis</span>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
 
-<!-- ========== SKILLS ========== -->
+<!-- ===== SKILLS ===== -->
 <section id="skills" class="section-padding">
     <div class="container">
         <span class="section-tag reveal">05. Tech Stack</span>
         <h2 style="font-size:2.5rem;margin-bottom:3rem;" class="reveal reveal-delay-1">Core Expertise</h2>
         <div class="skills-container">
+
             <div class="skill-box glass-card reveal reveal-delay-1">
                 <h3 class="gradient-text">🤖 AI & Machine Learning</h3>
                 <div class="skill-bar-item"><div class="skill-bar-label"><span>ChatGPT / GPT-4</span><span>90%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="90"></div></div></div>
@@ -614,13 +541,15 @@
                 <div class="skill-bar-item"><div class="skill-bar-label"><span>Prompt Engineering</span><span>88%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="88"></div></div></div>
                 <div class="skill-bar-item"><div class="skill-bar-label"><span>Workflow Automation</span><span>80%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="80"></div></div></div>
             </div>
+
             <div class="skill-box glass-card reveal reveal-delay-2">
                 <h3 class="gradient-text">💻 Development</h3>
-                <div class="skill-bar-item"><div class="skill-bar-label"><span>Python (Pandas, Flask)</span><span>82%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="82"></div></div></div>
+                <div class="skill-bar-item"><div class="skill-bar-label"><span>Python</span><span>82%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="82"></div></div></div>
                 <div class="skill-bar-item"><div class="skill-bar-label"><span>JavaScript ES6+</span><span>75%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="75"></div></div></div>
                 <div class="skill-bar-item"><div class="skill-bar-label"><span>HTML5 / CSS3</span><span>90%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="90"></div></div></div>
                 <div class="skill-bar-item"><div class="skill-bar-label"><span>React.js</span><span>65%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="65"></div></div></div>
             </div>
+
             <div class="skill-box glass-card reveal reveal-delay-3">
                 <h3 class="gradient-text">🎮 Game Art & Design</h3>
                 <div class="skill-bar-item"><div class="skill-bar-label"><span>Blender</span><span>88%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="88"></div></div></div>
@@ -628,52 +557,58 @@
                 <div class="skill-bar-item"><div class="skill-bar-label"><span>ZBrush</span><span>70%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="70"></div></div></div>
                 <div class="skill-bar-item"><div class="skill-bar-label"><span>Substance Painter</span><span>72%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="72"></div></div></div>
             </div>
+
             <div class="skill-box glass-card reveal reveal-delay-4">
                 <h3 class="gradient-text">🛠 Tools</h3>
                 <div class="skill-bar-item"><div class="skill-bar-label"><span>Git / GitHub</span><span>85%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="85"></div></div></div>
                 <div class="skill-bar-item"><div class="skill-bar-label"><span>Zapier / Power Automate</span><span>78%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="78"></div></div></div>
-                <div class="skill-bar-item"><div class="skill-bar-label"><span>Docker</span><span>60%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="60"></div></div></div>
                 <div class="skill-bar-item"><div class="skill-bar-label"><span>Figma</span><span>75%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="75"></div></div></div>
+                <div class="skill-bar-item"><div class="skill-bar-label"><span>Photoshop</span><span>80%</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="80"></div></div></div>
             </div>
+
         </div>
     </div>
 </section>
 
-<!-- ========== PROJECTS ========== -->
+<!-- ===== PROJECTS ===== -->
 <section id="projects" class="section-padding" style="background:var(--grid-line);">
     <div class="container">
         <span class="section-tag reveal">06. Dev Projects</span>
         <h2 style="font-size:2.5rem;margin-bottom:3rem;" class="reveal reveal-delay-1">Featured Software Work</h2>
         <div class="projects-grid">
+
             <div class="glass-card project-card reveal reveal-delay-1" data-tilt>
-                <img src="https://placehold.co/600x400/4f46e5/FFFFFF?text=Agro+System" class="project-img" alt="Agro">
+                <img src="https://placehold.co/600x400/4f46e5/FFFFFF?text=Agro+System" class="project-img" alt="">
                 <div class="project-body">
                     <h3 style="margin-bottom:0.5rem;">AI-Powered Agro Shop System</h3>
-                    <p class="project-desc">A desktop application developed in VB.NET to digitize and automate agricultural retail operations, featuring AI-driven inventory and sales predictions.</p>
+                    <p class="project-desc">A desktop application developed in VB.NET to digitize and automate agricultural retail operations with AI-driven inventory predictions.</p>
                     <div class="role-tags"><span class="tech-tag">VB.NET</span><span class="tech-tag">MS Access</span><span class="tech-tag">AI</span></div>
                 </div>
             </div>
+
             <div class="glass-card project-card reveal reveal-delay-2" data-tilt>
-                <img src="https://placehold.co/600x400/8b5cf6/FFFFFF?text=Automation+Suite" class="project-img" alt="Automation">
+                <img src="https://placehold.co/600x400/8b5cf6/FFFFFF?text=Automation+Suite" class="project-img" alt="">
                 <div class="project-body">
                     <h3 style="margin-bottom:0.5rem;">ChatGPT Automation Suite</h3>
-                    <p class="project-desc">Custom workflows using Python and OpenAI API to automate content generation, data summarization, and customer support emails.</p>
+                    <p class="project-desc">Custom workflows using Python and OpenAI API to automate content generation, data summarization, and customer support.</p>
                     <div class="role-tags"><span class="tech-tag">Python</span><span class="tech-tag">OpenAI API</span><span class="tech-tag">Zapier</span></div>
                 </div>
             </div>
+
             <div class="glass-card project-card reveal reveal-delay-3" data-tilt>
-                <img src="https://placehold.co/600x400/10b981/FFFFFF?text=AI+Platform" class="project-img" alt="AI Platform">
+                <img src="https://placehold.co/600x400/10b981/FFFFFF?text=AI+Platform" class="project-img" alt="">
                 <div class="project-body">
                     <h3 style="margin-bottom:0.5rem;">Multi-Modal AI Platform</h3>
-                    <p class="project-desc">A conceptual platform designed in Figma leveraging Google's Gemini for analyzing documents and images to extract intelligent insights.</p>
+                    <p class="project-desc">A conceptual platform leveraging Google Gemini for analyzing documents and images to extract intelligent insights.</p>
                     <div class="role-tags"><span class="tech-tag">Gemini AI</span><span class="tech-tag">Figma</span><span class="tech-tag">UX Design</span></div>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
 
-<!-- ========== CONTACT ========== -->
+<!-- ===== CONTACT ===== -->
 <section id="contact" class="section-padding">
     <div class="container">
         <span class="section-tag reveal">07. Connect</span>
@@ -682,19 +617,19 @@
             <div class="reveal reveal-delay-2">
                 <p style="font-size:1.1rem;color:var(--text-secondary);margin-bottom:2rem;">Open to new opportunities in AI Automation and Game Art.</p>
                 <a href="mailto:jp1prasads@gmail.com" class="social-link" data-hover>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                     <div><div style="font-size:0.8rem;color:var(--text-secondary);">Email</div><div style="font-weight:600;">jp1prasads@gmail.com</div></div>
                 </a>
                 <div class="social-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                     <div><div style="font-size:0.8rem;color:var(--text-secondary);">Phone</div><div style="font-weight:600;">9353437302</div></div>
                 </div>
                 <a href="https://www.youtube.com/@Prasadcreation" target="_blank" class="social-link" data-hover>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
                     <div><div style="font-size:0.8rem;color:var(--text-secondary);">YouTube</div><div style="font-weight:600;">Prasad Creations</div></div>
                 </a>
                 <a href="https://githubs010.github.io/PrasadPortfolio/" target="_blank" class="social-link" data-hover>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
                     <div><div style="font-size:0.8rem;color:var(--text-secondary);">GitHub</div><div style="font-weight:600;">Code Portfolio</div></div>
                 </a>
             </div>
@@ -709,15 +644,19 @@
 </section>
 
 <footer style="padding:2rem 0;text-align:center;border-top:1px solid var(--surface-border);">
-    <p style="color:var(--text-secondary);font-size:0.9rem;">&copy; 2025 Prasad J. · Crafted with Code & Creativity 🎮</p>
+    <p style="color:var(--text-secondary);font-size:0.9rem;">&copy; 2026 Prasad J. · Crafted with Code & Creativity 🎮</p>
 </footer>
 
 </main>
 
 <!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-    <button class="lightbox-close">✕</button>
-    <img id="lightbox-img" src="" alt="Full View">
+<div class="lightbox" id="lightbox">
+    <div class="lightbox-backdrop" onclick="closeLightbox()"></div>
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <div class="lightbox-inner">
+        <img id="lightbox-img" src="" alt="">
+    </div>
+    <div class="lightbox-caption" id="lightbox-caption"></div>
 </div>
 
 <script>
@@ -729,134 +668,161 @@ document.addEventListener('DOMContentLoaded', () => {
     // NEURAL CANVAS
     const canvas = document.getElementById('neural-canvas');
     const ctx = canvas.getContext('2d');
-    let W, H, pts = [], mouse = {x:null,y:null}, sY = 0;
+    let W, H, pts = [], mouse = {x:null, y:null};
     function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
     class P {
         constructor(){ this.x=Math.random()*W; this.y=Math.random()*H; this.vx=(Math.random()-.5)*.5; this.vy=(Math.random()-.5)*.5; this.s=Math.random()*2+1; }
         update(){ this.x+=this.vx; this.y+=this.vy; if(this.x<0||this.x>W)this.vx*=-1; if(this.y<0||this.y>H)this.vy*=-1; }
         draw(){ ctx.fillStyle='rgba(99,102,241,0.8)'; ctx.beginPath(); ctx.arc(this.x,this.y,this.s,0,Math.PI*2); ctx.fill(); }
     }
-    window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
-    window.addEventListener('scroll',()=>{sY=window.scrollY;});
-    window.addEventListener('resize',resize);
-    function init(){ pts=[]; for(let i=0;i<70;i++)pts.push(new P()); }
+    window.addEventListener('mousemove', e=>{ mouse.x=e.clientX; mouse.y=e.clientY; });
+    window.addEventListener('resize', resize);
+    function init(){ pts=[]; for(let i=0;i<70;i++) pts.push(new P()); }
     function draw(){
         ctx.clearRect(0,0,W,H);
-        ctx.save(); ctx.translate(0,sY*.04);
-        pts.forEach(p=>{p.update();p.draw();});
+        pts.forEach(p=>{ p.update(); p.draw(); });
         for(let i=0;i<pts.length;i++){
             for(let j=i+1;j<pts.length;j++){
-                const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+                const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
                 if(d<140){ ctx.beginPath(); ctx.strokeStyle=`rgba(99,102,241,${1-d/140})`; ctx.lineWidth=.5; ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y); ctx.stroke(); }
             }
             if(mouse.x){
-                const dx=pts[i].x-mouse.x,dy=pts[i].y-mouse.y,d=Math.sqrt(dx*dx+dy*dy);
+                const dx=pts[i].x-mouse.x, dy=pts[i].y-mouse.y, d=Math.sqrt(dx*dx+dy*dy);
                 if(d<200){ ctx.beginPath(); ctx.strokeStyle=`rgba(168,85,247,${1-d/200})`; ctx.lineWidth=.8; ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(mouse.x,mouse.y); ctx.stroke(); }
             }
         }
-        ctx.restore();
         requestAnimationFrame(draw);
     }
     resize(); init(); draw();
 
-    // REVEAL
-    const ro = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.1});
-    document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+    // SCROLL REVEAL
+    const ro = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:0.1});
+    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 
     // SKILL BARS
-    const bo = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.querySelectorAll('.skill-bar-fill').forEach(b=>b.style.width=b.dataset.width+'%');}),{threshold:0.3});
-    document.querySelectorAll('.skill-box').forEach(b=>bo.observe(b));
+    const bo = new IntersectionObserver(es => es.forEach(e => {
+        if(e.isIntersecting) e.target.querySelectorAll('.skill-bar-fill').forEach(b => b.style.width = b.dataset.width + '%');
+    }), {threshold:0.3});
+    document.querySelectorAll('.skill-box').forEach(b => bo.observe(b));
 
     // CURSOR
-    const dot=document.querySelector('.cursor-dot'), out=document.querySelector('.cursor-outline');
-    window.addEventListener('mousemove',e=>{
-        dot.style.left=e.clientX+'px'; dot.style.top=e.clientY+'px';
-        out.animate({left:e.clientX+'px',top:e.clientY+'px'},{duration:400,fill:'forwards'});
+    const dot = document.querySelector('.cursor-dot');
+    const out = document.querySelector('.cursor-outline');
+    window.addEventListener('mousemove', e => {
+        dot.style.left = e.clientX + 'px';
+        dot.style.top  = e.clientY + 'px';
+        out.animate({left: e.clientX+'px', top: e.clientY+'px'}, {duration:400, fill:'forwards'});
     });
-    window.addEventListener('mousedown',()=>out.classList.add('clicking'));
-    window.addEventListener('mouseup',()=>out.classList.remove('clicking'));
-    document.querySelectorAll('[data-hover]').forEach(el=>{
-        el.addEventListener('mouseenter',()=>out.classList.add('hovered'));
-        el.addEventListener('mouseleave',()=>out.classList.remove('hovered'));
+    window.addEventListener('mousedown', () => out.classList.add('clicking'));
+    window.addEventListener('mouseup',   () => out.classList.remove('clicking'));
+    document.querySelectorAll('[data-hover]').forEach(el => {
+        el.addEventListener('mouseenter', () => out.classList.add('hovered'));
+        el.addEventListener('mouseleave', () => out.classList.remove('hovered'));
     });
 
     // TILT
-    document.querySelectorAll('[data-tilt]').forEach(el=>{
-        el.addEventListener('mousemove',e=>{
-            const r=el.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
-            el.style.transform=`perspective(1000px) rotateX(${((y-r.height/2)/r.height)*-6}deg) rotateY(${((x-r.width/2)/r.width)*6}deg) scale3d(1.02,1.02,1.02)`;
+    document.querySelectorAll('[data-tilt]').forEach(el => {
+        el.addEventListener('mousemove', e => {
+            const r = el.getBoundingClientRect();
+            const x = e.clientX - r.left, y = e.clientY - r.top;
+            el.style.transform = `perspective(1000px) rotateX(${((y-r.height/2)/r.height)*-6}deg) rotateY(${((x-r.width/2)/r.width)*6}deg) scale3d(1.02,1.02,1.02)`;
         });
-        el.addEventListener('mouseleave',()=>el.style.transform='perspective(1000px) rotateX(0) rotateY(0) scale3d(1,1,1)');
+        el.addEventListener('mouseleave', () => el.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1,1,1)');
     });
 
-    // MAGNETIC
-    document.querySelectorAll('.btn-magnetic').forEach(w=>{
-        const b=w.querySelector('.btn');
-        w.addEventListener('mousemove',e=>{
-            const r=w.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2;
-            if(b)b.style.transform=`translate(${x*.3}px,${y*.3}px)`;
+    // MAGNETIC BUTTONS
+    document.querySelectorAll('.btn-magnetic').forEach(w => {
+        const b = w.querySelector('.btn');
+        w.addEventListener('mousemove', e => {
+            const r = w.getBoundingClientRect();
+            const x = e.clientX - r.left - r.width/2;
+            const y = e.clientY - r.top  - r.height/2;
+            if(b) b.style.transform = `translate(${x*.3}px,${y*.3}px)`;
         });
-        w.addEventListener('mouseleave',()=>{if(b)b.style.transform='translate(0,0)';});
+        w.addEventListener('mouseleave', () => { if(b) b.style.transform = 'translate(0,0)'; });
     });
 
     // TYPEWRITER
-    const roles=['Junior Game Artist','AI & Automation Dev','3D Asset Creator','Prompt Engineer','Full Stack Developer'];
-    const tw=document.querySelector('.typewriter');
-    let ri=0,ci=0,del=false;
+    const roles = ['Junior Game Artist','AI & Automation Dev','3D Asset Creator','Prompt Engineer','Full Stack Developer'];
+    const tw = document.querySelector('.typewriter');
+    let ri=0, ci=0, del=false;
     function type(){
-        if(!tw)return;
-        const r=roles[ri];
-        tw.textContent=del?r.substring(0,ci-1):r.substring(0,ci+1);
-        del?ci--:ci++;
-        if(!del&&ci===r.length){del=true;setTimeout(type,2000);}
-        else if(del&&ci<=0){del=false;ri=(ri+1)%roles.length;setTimeout(type,500);}
-        else setTimeout(type,del?45:95);
+        if(!tw) return;
+        const r = roles[ri];
+        tw.textContent = del ? r.substring(0,ci-1) : r.substring(0,ci+1);
+        del ? ci-- : ci++;
+        if(!del && ci===r.length){ del=true; setTimeout(type,2000); }
+        else if(del && ci<=0){ del=false; ri=(ri+1)%roles.length; setTimeout(type,500); }
+        else setTimeout(type, del?45:95);
     }
     type();
 
     // THEME
-    const tb=document.getElementById('theme-btn'),html=document.documentElement;
-    if(localStorage.getItem('theme')==='dark'||(!localStorage.getItem('theme')&&window.matchMedia('(prefers-color-scheme: dark)').matches)){
-        html.classList.add('dark-mode'); if(tb)tb.querySelector('.icon').textContent='🌙';
+    const tb = document.getElementById('theme-btn');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if(saved==='dark' || (!saved && prefersDark)){
+        html.classList.add('dark-mode');
+        if(tb) tb.querySelector('.icon').textContent = '🌙';
     }
     if(tb){
-        tb.addEventListener('click',()=>{
+        tb.addEventListener('click', () => {
             html.classList.toggle('dark-mode');
-            const d=html.classList.contains('dark-mode');
-            tb.querySelector('.icon').textContent=d?'🌙':'☀';
-            localStorage.setItem('theme',d?'dark':'light');
+            const d = html.classList.contains('dark-mode');
+            tb.querySelector('.icon').textContent = d ? '🌙' : '☀';
+            localStorage.setItem('theme', d ? 'dark' : 'light');
         });
     }
 
-    // NAV
-    const nav=document.getElementById('navbar');
-    window.addEventListener('scroll',()=>nav&&nav.classList.toggle('scrolled',window.scrollY>50));
-    const mb=document.querySelector('.mobile-menu-btn'),nl=document.querySelector('.nav-links');
-    if(mb&&nl){
-        mb.addEventListener('click',()=>{nl.classList.toggle('active');mb.textContent=nl.classList.contains('active')?'✕':'☰';});
-        document.querySelectorAll('.nav-link').forEach(l=>l.addEventListener('click',()=>{nl.classList.remove('active');mb.textContent='☰';}));
+    // NAVBAR SCROLL
+    const nav = document.getElementById('navbar');
+    window.addEventListener('scroll', () => nav && nav.classList.toggle('scrolled', window.scrollY > 50));
+
+    // MOBILE MENU
+    const mb = document.querySelector('.mobile-menu-btn');
+    const nl = document.querySelector('.nav-links');
+    if(mb && nl){
+        mb.addEventListener('click', () => {
+            nl.classList.toggle('active');
+            mb.textContent = nl.classList.contains('active') ? '✕' : '☰';
+        });
+        document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', () => {
+            nl.classList.remove('active'); mb.textContent = '☰';
+        }));
     }
 
     // CONTACT FORM
-    const form=document.getElementById('contact-form');
+    const form = document.getElementById('contact-form');
     if(form){
-        form.addEventListener('submit',e=>{
+        form.addEventListener('submit', e => {
             e.preventDefault();
-            const b=e.target.querySelector('button');
-            b.textContent='✅ Sent!'; b.style.background='#10b981';
-            setTimeout(()=>{b.textContent='Send Message';b.style.background='';form.reset();},3000);
+            const b = e.target.querySelector('button[type="submit"]');
+            b.textContent = '✅ Sent!';
+            b.style.background = '#10b981';
+            setTimeout(() => { b.textContent='Send Message'; b.style.background=''; form.reset(); }, 3000);
         });
     }
+
 });
 
-function openLightbox(src){
-    document.getElementById('lightbox-img').src=src;
-    document.getElementById('lightbox').classList.add('active');
+// LIGHTBOX FUNCTIONS
+function openLightbox(src, caption) {
+    const lb  = document.getElementById('lightbox');
+    const img = document.getElementById('lightbox-img');
+    const cap = document.getElementById('lightbox-caption');
+    img.src = src;
+    if(cap) cap.textContent = caption || '';
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
 }
-function closeLightbox(){
-    document.getElementById('lightbox').classList.remove('active');
-    document.getElementById('lightbox-img').src='';
+function closeLightbox() {
+    const lb = document.getElementById('lightbox');
+    lb.classList.remove('active');
+    document.getElementById('lightbox-img').src = '';
+    document.body.style.overflow = '';
 }
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
 </script>
 </body>
 </html>
